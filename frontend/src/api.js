@@ -1,4 +1,4 @@
-const BASE = "http://localhost:5000/api";
+const BASE = "https://skill-swap.onrender.com";
 
 export const api = async (path, opts = {}) => {
   const token = localStorage.getItem("token");
