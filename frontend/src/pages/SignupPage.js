@@ -44,7 +44,7 @@ export default function SignupPage({ onSuccess, onGoLogin, toast }) {
     if (!form.skills_needed.length)  return toast("Select at least 1 skill you need","error");
     setLoading(true);
     try {
-      await api("/register",{method:"POST",body:JSON.stringify({
+      await api("/api/register",{method:"POST",body:JSON.stringify({
         username:form.username, email:form.email, password:form.password,
         skills_offered:form.skills_offered, skills_needed:form.skills_needed,
       })});

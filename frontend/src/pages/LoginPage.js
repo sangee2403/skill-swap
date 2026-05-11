@@ -11,9 +11,8 @@ export default function LoginPage({ onLogin, onGoSignup, toast }) {
   const submit = async () => {
     if (!form.email || !form.password) return toast("Fill all fields","error");
     setLoading(true);
-    try {
-      const data = await api("/login",{method:"POST",body:JSON.stringify(form)});
-      localStorage.setItem("token", data.token);
+    try { 
+      const data = await api("/api/login",{ method:"POST", body:JSON.stringify(form) });      localStorage.setItem("token", data.token);
       localStorage.setItem("user",  JSON.stringify(data.user));
       toast("Welcome back, " + data.user.username + "! 🎉");
       onLogin(data.user);
