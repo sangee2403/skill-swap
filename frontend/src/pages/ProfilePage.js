@@ -26,10 +26,10 @@ export default function ProfilePage({ user, setUser, setPage, toast }) {
 
   useEffect(()=>{
     checkConnection();
-    fetch("http://localhost:5000/api/expert-ratings").then(r=>r.json())
+    fetch("https://skill-swap-cs2a.onrender.com/api/expert-ratings").then(r=>r.json())
       .then(d=>setRatings(Array.isArray(d)?d:[])).catch(()=>{});
     if (user?.id) {
-      fetch(`http://localhost:5000/api/reviews/${user.id}`).then(r=>r.json())
+      fetch(`https://skill-swap-cs2a.onrender.com/api/reviews/${user.id}`).then(r=>r.json())
         .then(d=>setReviews(Array.isArray(d)?d:[])).catch(()=>{});
     }
   },[user]);
@@ -38,7 +38,7 @@ export default function ProfilePage({ user, setUser, setPage, toast }) {
     if (!user?.id) return;
     setLoadingBC(true);
     Promise.all([
-      fetch(`http://localhost:5000/api/skill-credentials/${user.id}`).then(r=>r.json()).catch(()=>[]),
+      fetch(`https://skill-swap-cs2a.onrender.com/api/skill-credentials/${user.id}`).then(r=>r.json()).catch(()=>[]),
       fetch(`http://localhost:5000/api/sessions`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
       }).then(r=>r.json()).catch(()=>[]),
