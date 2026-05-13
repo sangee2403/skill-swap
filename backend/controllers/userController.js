@@ -49,48 +49,52 @@ exports.findMatches = async (req, res) => {
   try {
     const userId = req.params.userId || req.user.id;
 
+    // Current user
     const userResult = await pool.query(
-      'SELECT skills_needed FROM users WHERE id = $1',
+      'SELECT * FROM users WHERE id = $1',
       [userId]
     );
-    if (userResult.rows.length === 0) return res.status(404).json({ msg: 'User not found' });
 
-    const myNeeds = userResult.rows[0].skills_needed;
-
-    if (!myNeeds || myNeeds.length === 0) {
-      return res.json([]);
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ msg: 'User not found' });
     }
 
-    const matches = await pool.query(
-      `SELECT id, username, email, skills_offered, skills_needed, wallet_address, bio, is_verified
-       FROM users
-       WHERE skills_offered && $1
-         AND id != $2`,
-      [myNeeds, userId]
+    const currentUser = userResult.rows[0];
+
+    const myOffered = (currentUser.skills_offered || []).map(s =>
+      s.toLowerCase().trim()
     );
 
-    // ── Save matches to matches table ──────────────────────────────────────
-    for (const match of matches.rows) {
-      // Check if match already exists (either direction)
-      const existing = await pool.query(
-        `SELECT id FROM matches 
-         WHERE (user_id = $1 AND matched_id = $2) 
-            OR (user_id = $2 AND matched_id = $1)`,
-        [userId, match.id]
-      );
-      if (existing.rows.length === 0) {
-        // Calculate match score — count overlapping skills
-        const theirOffered = match.skills_offered || [];
-        const score = myNeeds.filter(s => theirOffered.includes(s)).length;
-        await pool.query(
-          `INSERT INTO matches (user_id, matched_id, match_score, status)
-           VALUES ($1, $2, $3, 'pending')`,
-          [userId, match.id, score]
-        );
-      }
-    }
+    const myNeeded = (currentUser.skills_needed || []).map(s =>
+      s.toLowerCase().trim()
+    );
 
-    res.json(matches.rows);
+    // Get all other users
+    const allUsers = await pool.query(
+      'SELECT * FROM users WHERE id != $1',
+      [userId]
+    );
+
+    const matches = allUsers.rows.filter(other => {
+      const otherOffered = (other.skills_offered || []).map(s =>
+        s.toLowerCase().trim()
+      );
+
+      const otherNeeded = (other.skills_needed || []).map(s =>
+        s.toLowerCase().trim()
+      );
+
+      const iNeedWhatTheyOffer =
+        myNeeded.some(skill => otherOffered.includes(skill));
+
+      const theyNeedWhatIOffer =
+        myOffered.some(skill => otherNeeded.includes(skill));
+
+      return iNeedWhatTheyOffer && theyNeedWhatIOffer;
+    });
+
+    res.json(matches);
+
   } catch (err) {
     console.error('Match Error:', err.message);
     res.status(500).json({ error: err.message });
