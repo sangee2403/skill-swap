@@ -43,7 +43,7 @@ export default function DashboardPage({ user, setPage, setVideoRoom, toast }) {
     if (!user?.id) return;
     Promise.all([
       api(`/matches/${user.id}`).catch(() => []),
-      fetch("http://localhost:5000/api/expert-ratings").then(r => r.json()).catch(() => []),
+      fetch("https://skill-swap-cs2a.onrender.com/api/expert-ratings").then(r => r.json()).catch(() => []),
     ]).then(([m, r]) => {
       setMatches(Array.isArray(m) ? m : []);
       setRatings(Array.isArray(r) ? r : []);
