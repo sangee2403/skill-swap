@@ -8,7 +8,7 @@ This project includes smart skill matching, user authentication, and blockchain 
 
 ## 🌐 Live Demo
 
-👉 https://skill-swap-delta-seven.vercel.app
+👉 https://skill-swap-eight-beryl.vercel.app/
 
 ---
 
