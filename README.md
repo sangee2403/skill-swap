@@ -92,7 +92,7 @@ npm start
 3️⃣ Setup Backend
 cd backend
 npm install
-node index.js
+node server.js
 
 🔐 Environment Variables
 
